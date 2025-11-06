@@ -8,9 +8,8 @@ Original file is located at
 """
 
 import streamlit as st
-from collections import deque
 
-# --- Define the directed graph ---
+# --- Define the directed graph (based on your image) ---
 graph = {
     'A': ['B', 'D'],
     'B': ['C', 'E', 'G'],
@@ -22,83 +21,39 @@ graph = {
     'H': ['F', 'G']
 }
 
-# --- BFS function ---
-def bfs(graph, start):
-    visited = []
-    queue = deque([start])
-    traversal_order = []
-
-    while queue:
-        node = queue.popleft()
-        if node not in visited:
-            visited.append(node)
-            traversal_order.append(node)
-            for neighbor in sorted(graph[node]):  # Alphabetical order
-                if neighbor not in visited:
-                    queue.append(neighbor)
-    return traversal_order
-
-
 # --- DFS function ---
 def dfs(graph, start, visited=None):
     if visited is None:
         visited = []
     visited.append(start)
 
-    for neighbor in sorted(graph[start]):  # Alphabetical order
+    for neighbor in sorted(graph[start]):  # alphabetical order
         if neighbor not in visited:
             dfs(graph, neighbor, visited)
     return visited
 
-
 # --- Streamlit interface ---
-st.title("Breadth-First Search (BFS) & Depth-First Search (DFS)")
-st.write("This app demonstrates both **BFS** and **DFS** algorithms using the directed graph below.")
+st.title("Depth-First Search (DFS) Traversal")
+st.write("This app performs **Depth-First Search (DFS)** on the directed graph shown below.")
 
-# Choose algorithm
-algorithm = st.radio("Select Algorithm:", ("Breadth-First Search (BFS)", "Depth-First Search (DFS)"))
-
-# Choose starting node
+# Select starting node
 start_node = st.selectbox("Select starting node:", list(graph.keys()), index=0)
 
-# Run the selected algorithm
-if st.button("Run Search"):
-    if algorithm == "Breadth-First Search (BFS)":
-        result = bfs(graph, start_node)
-        st.success(f"**BFS Traversal starting from '{start_node}':**")
-        st.write(" → ".join(result))
+# Run DFS when button clicked
+if st.button("Run DFS Traversal"):
+    result = dfs(graph, start_node)
+    st.success(f"**DFS Traversal starting from '{start_node}':**")
+    st.write(" → ".join(result))
 
-        # Optional: Show level info for BFS
-        st.subheader("Traversal Process (Levels)")
-        visited = []
-        queue = deque([start_node])
-        level = 0
-        while queue:
-            level_nodes = list(queue)
-            st.write(f"**Level {level}:** {', '.join(level_nodes)}")
-            next_level = deque()
-            for node in level_nodes:
-                if node not in visited:
-                    visited.append(node)
-                    for neighbor in sorted(graph[node]):
-                        if neighbor not in visited and neighbor not in queue:
-                            next_level.append(neighbor)
-            queue = next_level
-            level += 1
+    # Show step-by-step traversal
+    st.subheader("Traversal Process (Step-by-Step)")
+    for i, node in enumerate(result, 1):
+        st.write(f"**Step {i}:** Visit {node}")
 
-    else:  # DFS
-        result = dfs(graph, start_node)
-        st.success(f"**DFS Traversal starting from '{start_node}':**")
-        st.write(" → ".join(result))
-
-        st.subheader("Traversal Process (Step-by-Step)")
-        for i, node in enumerate(result, 1):
-            st.write(f"**Step {i}:** Visit {node}")
-
-# Show adjacency list
+# Display the graph structure
 st.subheader("Graph Structure (Adjacency List)")
 for node, neighbors in graph.items():
     st.write(f"**{node}** → {', '.join(neighbors) if neighbors else '(no neighbors)'}")
 
-st.caption("Developed for Search Algorithms Lab — BFS & DFS Example")
+st.caption("Developed for Search Algorithms Lab — DFS Example")
 
